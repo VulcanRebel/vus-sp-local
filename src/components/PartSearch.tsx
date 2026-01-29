@@ -1,29 +1,16 @@
 // src/components/PartSearch.tsx
 
 import { useEffect, useState } from 'react';
-import { auth, db, analytics } from '../firebase';
-import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import type { User } from 'firebase/auth';
-import type { WhereFilterOp } from 'firebase/firestore';
-import { logEvent } from 'firebase/analytics';
+// REMOVED: Firebase imports (auth, db, analytics, etc.)
+// import { logEvent } from 'firebase/analytics'; 
 
-import { useProgressivePartSearch } from '../hooks/useProgressivePartSearch';
-import type { SearchConfig as HookSearchConfig } from '../hooks/useProgressivePartSearch';
-
-// --- CONFIGURATION INTERFACE (local, structurally compatible with hook) ---
-interface SearchConfig {
-  serverFilters: {
-    field: string;
-    op: WhereFilterOp;
-    value: string;
-  }[];
-
-  clientFilterField?: string;
-  clientFilterValues?: string[];
-}
+// IMPORT NEW HOOK
+import { useLocalPartSearch } from '../hooks/useLocalPartSearch';
+import type { LocalSearchConfig } from '../hooks/useLocalPartSearch';
 
 // --- SEARCH CONFIG MAP ---
-const SEARCH_CONFIG_MAP: Record<string, SearchConfig> = {
+// Kept exactly as you had it, but types are now handled by the backend
+const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
   // --- Signs ---
   hdpe_sign: {
     serverFilters: [
@@ -36,7 +23,7 @@ const SEARCH_CONFIG_MAP: Record<string, SearchConfig> = {
   acm_sign: {
     serverFilters: [
       { field: 'Part Group', op: '==', value: 'Signs' },
-      { field: 'Name', op: '>=', value: '3mm' },
+      { field: 'Name', op: '>=', value: '3mm' }, // Backend converts this to SQL
       { field: 'Name', op: '<=', value: '3mm\uf8ff' },
     ],
     clientFilterField: 'Part Type',
@@ -105,22 +92,19 @@ type PartSearchProps = {
 
 export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = false }: PartSearchProps) {
 
-  // --- AUTH STATE ---
-  const [user, setUser] = useState<User | null>(null);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState('');
+  // --- MOCK AUTH STATE ---
+  // Since we are local, we bypass login. You are always "Admin".
+  const user = { email: 'local-admin@vus.com', uid: 'local' }; 
 
   // --- SEARCH INPUTS ---
   const [searchName, setSearchName] = useState('');
   const [searchNameSuffix, setSearchNameSuffix] = useState('');
-useEffect(() => {
-  if (!autoGenerateOn) return;
-  if (!prefillSearchTerm) return;
-
-  // Keep the generated prefix in sync, preserve user suffix
-  setSearchName(`${prefillSearchTerm}${searchNameSuffix}`);
-}, [autoGenerateOn, prefillSearchTerm, searchNameSuffix]);
+  
+  useEffect(() => {
+    if (!autoGenerateOn) return;
+    if (!prefillSearchTerm) return;
+    setSearchName(`${prefillSearchTerm}${searchNameSuffix}`);
+  }, [autoGenerateOn, prefillSearchTerm, searchNameSuffix]);
 
   useEffect(() => {
     if (autoGenerateOn) return;
@@ -128,22 +112,13 @@ useEffect(() => {
   }, [autoGenerateOn]);
   
   const [searchType, setSearchType] = useState('');
-
-  // --- UI VALIDATION ERROR (separate from hook/network errors) ---
   const [uiError, setUiError] = useState('');
 
-  // --- AUTH LISTENER ---
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
-    return () => unsubscribe();
-  }, []);
-
-  // --- PROGRESSIVE SEARCH HOOK ---
+  // --- LOCAL SEARCH HOOK ---
   const selectedConfig = searchType ? SEARCH_CONFIG_MAP[searchType] : undefined;
-
-  // Structural typing makes this safe; we still guard searching when no type selected.
-  const hookConfig: HookSearchConfig =
-    (selectedConfig as unknown as HookSearchConfig) ?? ({ serverFilters: [] } satisfies HookSearchConfig);
+  
+  // Safe default
+  const hookConfig = selectedConfig ?? { serverFilters: [] };
 
   const {
     results,
@@ -152,32 +127,15 @@ useEffect(() => {
     hasMore,
     search,
     loadMore,
-  } = useProgressivePartSearch({
-    db,
+  } = useLocalPartSearch({
     config: hookConfig,
     searchName,
-    targetCount: 100, // how many *filtered* results to show per click/page
-    serverChunkSize: 100, // how many raw docs to fetch per Firestore request
-    maxServerPagesPerRequest: 10, // safety cap to control read costs
+    targetCount: 100,
   });
 
   // --- ACTIONS ---
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError('');
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      logEvent(analytics, 'login', { method: 'email' });
-    } catch (err: any) {
-      console.error('Sign-in error:', err);
-      setAuthError('Failed to sign in. Check your email and password.');
-    }
-  };
-
   const handleSearchClick = () => {
     setUiError('');
-
-    if (!user) return;
 
     if (!searchType) {
       setUiError('Please select a part type.');
@@ -189,55 +147,15 @@ useEffect(() => {
       return;
     }
 
-    // Restore analytics logging for searches (fresh searches only)
-    logEvent(analytics, 'search', { part_type: searchType, search_term: searchName });
-
+    // console.log('Searching for:', searchType, searchName);
     search();
   };
-
-  // --- RENDER ---
-  if (!user) {
-    return (
-      <div className="p-5 max-w-md mx-auto border rounded mt-10">
-        <h2 className="text-xl font-bold mb-4">Sign In to Search Parts</h2>
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <div>
-            <label className="block font-semibold mb-1">Email:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded bg-gray-700"
-              required
-            />
-          </div>
-          {authError && <p className="text-red-600">{authError}</p>}
-          <button
-            type="submit"
-            className="cursor-pointer w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          >
-            Sign In
-          </button>
-        </form>
-      </div>
-    );
-  }
 
   return (
     <div className="p-5 max-w-4xl mx-auto mt-8 border-t">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Part Search</h2>
-        <div className="text-sm text-gray-600">Signed in as: {user.email}</div>
+        <h2 className="text-2xl font-bold">Part Search (Local)</h2>
+        <div className="text-sm text-gray-600">Mode: Local Admin</div>
       </div>
 
       <div className="flex gap-4 mb-6 items-end">
@@ -270,18 +188,16 @@ useEffect(() => {
                 return;
               }
         
-              // auto-gen ON: preserve prefix, store suffix
               if (prefillSearchTerm && next.startsWith(prefillSearchTerm)) {
                 setSearchNameSuffix(next.slice(prefillSearchTerm.length));
               } else if (!prefillSearchTerm) {
                 setSearchNameSuffix(next);
               } else {
-                // user edited prefix; treat whole value as suffix attempt
                 setSearchNameSuffix(next);
               }
             }}
             placeholder="Enter part name to filter"
-            className="w-full p-2 border rounded bg-gray-700"
+            className="w-full p-2 border rounded bg-gray-700 text-white"
           />
         </div>
 
