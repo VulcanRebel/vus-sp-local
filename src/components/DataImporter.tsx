@@ -52,38 +52,42 @@ export default function DataImporter({ onImportComplete }: { onImportComplete?: 
   };
 
   return (
-    <div className="max-w-4xl mx-auto mb-8">
+    <div className="mb-8">
+      {/* Updated Button Styling to match primary actions */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="text-sm bg-gray-700 hover:bg-gray-600 text-white py-1 px-3 rounded mb-2"
+        className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded shadow-md transition-colors flex items-center gap-2"
       >
-        {isOpen ? 'Close Importer' : '📂 Import PLEX Data'}
+        <span>{isOpen ? '✕ Close Importer' : '📂 Import PLEX Data'}</span>
       </button>
 
       {isOpen && (
-        <div className="bg-gray-800 p-6 rounded shadow-lg border border-gray-700 text-left">
-          <h3 className="text-xl font-bold mb-4 text-white">Import Data from PLEX</h3>
-          <p className="text-gray-400 text-sm mb-4">
-            Upload a JSON export. The system will automatically map "Name" or "Part No" to the search index.
-          </p>
+        <div className="mt-4 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 text-left animate-fade-in">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white">Import Data from PLEX</h3>
+              <p className="text-gray-400 text-sm mt-1">
+                Upload a JSON export. The system will automatically map "Name" or "Part No" to the search index.
+              </p>
+            </div>
+          </div>
           
-          <div className="border-2 border-dashed border-gray-600 rounded p-8 text-center hover:bg-gray-750 transition">
+          <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:bg-gray-750 hover:border-blue-500 transition-colors cursor-pointer relative">
             <input 
               type="file" 
               accept=".json"
               onChange={handleFileUpload}
               disabled={loading}
-              className="block w-full text-sm text-gray-400
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-600 file:text-white
-                file:cursor-pointer hover:file:bg-blue-700"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
+            <div className="text-gray-400 pointer-events-none">
+                <span className="text-4xl block mb-2">📄</span>
+                <span className="font-semibold text-blue-400">Click to upload</span> or drag and drop JSON file here
+            </div>
           </div>
 
           {message && (
-            <div className={`mt-4 font-bold ${message.includes('Error') ? 'text-red-400' : 'text-green-400'}`}>
+            <div className={`mt-4 p-3 rounded font-bold text-center ${message.includes('Error') ? 'bg-red-900/50 text-red-200' : 'bg-green-900/50 text-green-200'}`}>
               {message}
             </div>
           )}

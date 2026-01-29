@@ -5,9 +5,10 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* Standard Dark Mode Base */
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #111827; /* Matches Tailwind gray-900 */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,37 +16,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Links */
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #60a5fa; /* Tailwind blue-400 */
   text-decoration: inherit;
+  transition: color 0.2s;
 }
 a:hover {
-  color: #535bf2;
+  color: #93c5fd; /* Tailwind blue-300 */
 }
 
+/* CRITICAL FIX: 
+   Removed 'display: flex' and 'place-items: center'.
+   This allows the app to flow from top-to-bottom normally.
+*/
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #111827;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
