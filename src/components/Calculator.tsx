@@ -10,10 +10,11 @@ type CalculationResults = { [key: string]: { value: number | string; label: stri
 type CalculatorProps = {
   onSearchTermChange?: (value: string) => void;
   onAutoGenerateChange?: (on: boolean) => void;
+  onPartTypeChange?: (type: string) => void; // Added prop for fixing bug #2
 };
 
-export default function Calculator({ onSearchTermChange, onAutoGenerateChange }: CalculatorProps) {
-    // --- STATE (Complete and correct) ---
+export default function Calculator({ onSearchTermChange, onAutoGenerateChange, onPartTypeChange }: CalculatorProps) {
+    // --- STATE ---
     const [partGroup, setPartGroup] = useState<PartGroup>('lineMarkers');
     const [partType, setPartType] = useState('bullet');
     const [itemWidth, setItemWidth] = useState('48');
@@ -112,7 +113,7 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange }:
       customTubeLength,
     ]);
     
-    // --- EFFECTS (Correct) ---
+    // --- EFFECTS ---
     useEffect(() => {
         const firstPartType = PART_GROUP_OPTIONS[partGroup][0]?.value;
         if (firstPartType) { setPartType(firstPartType); }
@@ -121,7 +122,10 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange }:
 
     useEffect(() => {
         setResults(null); setError('');
-    }, [partType]);
+        
+        // Fix #2: Notify parent when Part Type changes
+        onPartTypeChange?.(partType);
+    }, [partType, onPartTypeChange]);
 
     // --- NEW EFFECTS for SEARCH POPULATE
     useEffect(() => {
@@ -140,7 +144,7 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange }:
       }
     }, [autoGeneratePartNo, autoPrefix, searchTermSuffix]);
     
-    // --- CALCULATION LOGIC (Complete and Correct) ---
+    // --- CALCULATION LOGIC ---
     const handleCalculate = () => {
         const width = parseFloat(itemWidth);
         const height = parseFloat(itemHeight);
@@ -305,7 +309,7 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange }:
         setResults(calculatedResults);
     };
     
-    // --- RENDER (Complete and Correct) ---
+    // --- RENDER ---
     return (
         <div className="p-5 max-w-2xl mx-auto">
             <h1 className="text-2xl text-left font-bold mb-4">Standard Procedures<span className="text-sm font-normal"></span></h1>

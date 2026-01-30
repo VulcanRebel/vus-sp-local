@@ -1,15 +1,9 @@
 // src/components/PartSearch.tsx
-
 import { useEffect, useState } from 'react';
-// REMOVED: Firebase imports (auth, db, analytics, etc.)
-// import { logEvent } from 'firebase/analytics'; 
-
-// IMPORT NEW HOOK
 import { useLocalPartSearch } from '../hooks/useLocalPartSearch';
 import type { LocalSearchConfig } from '../hooks/useLocalPartSearch';
 
 // --- SEARCH CONFIG MAP ---
-// Kept exactly as you had it, but types are now handled by the backend
 const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
   // --- Signs ---
   hdpe_sign: {
@@ -23,7 +17,7 @@ const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
   acm_sign: {
     serverFilters: [
       { field: 'Part Group', op: '==', value: 'Signs' },
-      { field: 'Name', op: '>=', value: '3mm' }, // Backend converts this to SQL
+      { field: 'Name', op: '>=', value: '3mm' },
       { field: 'Name', op: '<=', value: '3mm\uf8ff' },
     ],
     clientFilterField: 'Part Type',
@@ -88,24 +82,35 @@ const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
 type PartSearchProps = {
   prefillSearchTerm?: string;
   autoGenerateOn?: boolean;
+  autoSelectedPartType?: string; // New prop for auto-selection
 };
 
-export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = false }: PartSearchProps) {
+export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = false, autoSelectedPartType = '' }: PartSearchProps) {
 
   // --- MOCK AUTH STATE ---
-  // Since we are local, we bypass login. You are always "Admin".
   const user = { email: 'local-admin@vus.com', uid: 'local' }; 
 
   // --- SEARCH INPUTS ---
   const [searchName, setSearchName] = useState('');
   const [searchNameSuffix, setSearchNameSuffix] = useState('');
   
+  // FIX: Sync Part Type automatically when Auto-Generate is ON
+  useEffect(() => {
+    if (autoGenerateOn && autoSelectedPartType && SEARCH_CONFIG_MAP[autoSelectedPartType]) {
+      setSearchType(autoSelectedPartType);
+    }
+  }, [autoGenerateOn, autoSelectedPartType]);
+
+  // FIX: Update Search Name dynamically
+  // Removed the 'if (!prefillSearchTerm) return' guard clause.
+  // This allows the field to update even if the calculator temporarily sends an empty string,
+  // preventing the "lock" behavior when typing dimensions.
   useEffect(() => {
     if (!autoGenerateOn) return;
-    if (!prefillSearchTerm) return;
     setSearchName(`${prefillSearchTerm}${searchNameSuffix}`);
   }, [autoGenerateOn, prefillSearchTerm, searchNameSuffix]);
 
+  // Reset suffix when auto-gen is disabled
   useEffect(() => {
     if (autoGenerateOn) return;
     setSearchNameSuffix('');
@@ -147,7 +152,6 @@ export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = fa
       return;
     }
 
-    // console.log('Searching for:', searchType, searchName);
     search();
   };
 

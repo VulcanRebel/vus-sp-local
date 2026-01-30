@@ -9,6 +9,7 @@ import DataImporter from './components/DataImporter';
 function App() {
   const [searchPrefill, setSearchPrefill] = useState('');
   const [autoGenOn, setAutoGenOn] = useState(false);
+  const [autoPartType, setAutoPartType] = useState('');
   
   return (
     <main className="font-sans pb-20 bg-gray-900 min-h-screen text-white"> 
@@ -24,6 +25,7 @@ function App() {
           <Calculator
             onSearchTermChange={setSearchPrefill}
             onAutoGenerateChange={setAutoGenOn}
+            onPartTypeChange={setAutoPartType} // Wire up the Part Type change
           />
         </div>
         
@@ -32,6 +34,7 @@ function App() {
           <PartSearch
             prefillSearchTerm={searchPrefill}
             autoGenerateOn={autoGenOn}
+            autoSelectedPartType={autoPartType} // Pass down the Part Type
           /> 
         </div>
 
