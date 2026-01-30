@@ -93,9 +93,6 @@ export default function PartSearch({
   searchTrigger = 0 
 }: PartSearchProps) {
 
-  // --- MOCK AUTH STATE ---
-  const user = { email: 'local-admin@vus.com', uid: 'local' }; 
-
   // --- SEARCH INPUTS ---
   const [searchName, setSearchName] = useState('');
   const [searchNameSuffix, setSearchNameSuffix] = useState('');
