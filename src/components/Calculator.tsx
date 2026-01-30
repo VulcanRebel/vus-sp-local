@@ -75,30 +75,24 @@ export default function Calculator({
     
       if (!w || !h) return '';
     
-      // Aluminum
       if (partGroup === 'signs' && partType === 'aluminum_sign') {
         const g = formatGauge(alGauge);
         return g ? `${g}x${w}x${h}` : '';
       }
       
-      // ACM - Uses same format as Aluminum often, or just 3mmxWxH
-      // Based on your search config map: acm_sign uses "3mm" as keyword
       if (partGroup === 'signs' && partType === 'acm_sign') {
          return `3mmx${w}x${h}`;
       }
     
-      // HDPE
       if (partGroup === 'signs' && partType === 'hdpe_sign') {
         const g = hdpeSheetSize === '.023' ? '023' : '110';
         return `${g}x${w}x${h}`;
       }
     
-      // Corrugated
       if (partGroup === 'signs' && partType === 'corrugated') {
         return `${w}x${h}`;
       }
     
-      // Decals
       if (partGroup === 'decals') {
         return `${w}x${h}`;
       }
@@ -314,202 +308,234 @@ export default function Calculator({
     
     // --- RENDER ---
     return (
-        <div className="p-5 max-w-2xl mx-auto">
-            <h1 className="text-2xl text-left font-bold mb-4">Standard Procedures<span className="text-sm font-normal"></span></h1>
-            
-            <div className="space-y-3">
-                {/* Main Selectors */}
-                <div className="flex items-center">
-                    <label htmlFor="partGroup" className="w-48 text-left mr-4 font-semibold">Part Group:</label>
-                    <select id="partGroup" value={partGroup} onChange={(e) => setPartGroup(e.target.value as PartGroup)} className="w-48 p-2 border rounded bg-gray-700 text-white">
-                        <option value="signs">Signs</option><option value="decals">Decals</option><option value="lineMarkers">Markers</option><option value="other">Other</option>
-                    </select>
-                </div>
-                <div className="flex items-center">
-                    <label htmlFor="partType" className="w-48 text-left mr-4 font-semibold">Part Type:</label>
-                    <select id="partType" value={partType} onChange={(e) => setPartType(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
-                        {PART_GROUP_OPTIONS[partGroup].map(option => (<option key={option.value} value={option.value}>{option.text}</option>))}
-                    </select>
+        <div className="w-full">
+            <div className="space-y-6">
+                
+                {/* Main Selectors Group */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label htmlFor="partGroup" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Part Group</label>
+                        <select id="partGroup" value={partGroup} onChange={(e) => setPartGroup(e.target.value as PartGroup)} 
+                            className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0 transition-colors">
+                            <option value="signs">Signs</option>
+                            <option value="decals">Decals</option>
+                            <option value="lineMarkers">Markers</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="partType" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Part Type</label>
+                        <select id="partType" value={partType} onChange={(e) => setPartType(e.target.value)} 
+                            className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0 transition-colors">
+                            {PART_GROUP_OPTIONS[partGroup].map(option => (<option key={option.value} value={option.value}>{option.text}</option>))}
+                        </select>
+                    </div>
                 </div>
 
                 {/* --- LIVE PART SEARCH UI --- */}
-                <div className="space-y-3 pt-4 border-t mt-4">
-                  <div className="flex items-center">
-                    <label className="w-48 text-left mr-4 font-semibold">Auto-Search:</label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={autoGeneratePartNo}
-                        onChange={(e) => {
-                          const on = e.target.checked;
-                          setAutoGeneratePartNo(on);
-                          onAutoGenerateChange?.(on);
-                        
-                          if (on) {
-                            setSearchTermSuffix('');
-                            setSearchTerm(autoPrefix);
-                            onSearchTermChange?.(autoPrefix);
-                          }
-                        }}
-                        className="h-4 w-4"
-                      />
-                      <span className="text-sm">Enable</span>
+                <div className="grid grid-cols-12 gap-6 pt-6 border-t border-slate-800">
+                  <div className="col-span-12 md:col-span-4 flex items-end">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={autoGeneratePartNo}
+                          onChange={(e) => {
+                            const on = e.target.checked;
+                            setAutoGeneratePartNo(on);
+                            onAutoGenerateChange?.(on);
+                            if (on) {
+                              setSearchTermSuffix('');
+                              setSearchTerm(autoPrefix);
+                              onSearchTermChange?.(autoPrefix);
+                            }
+                          }}
+                          className="peer h-5 w-5 bg-slate-950 border border-slate-700 checked:bg-blue-600 checked:border-blue-600 focus:ring-0 transition-colors"
+                        />
+                        <svg className="absolute w-3 h-3 text-white hidden peer-checked:block left-1 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="4" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Enable Auto-Search</span>
                     </label>
                   </div>
                 
-                  <div className="flex items-center">
-                    <label className="w-48 text-left mr-4 font-semibold">Part # / Search:</label>
+                  <div className="col-span-12 md:col-span-8">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Part # / Search Term</label>
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => {
                         const next = e.target.value;
-                
                         if (!autoGeneratePartNo) {
                           setSearchTerm(next);
                           return;
                         }
-                
                         if (autoPrefix && next.startsWith(autoPrefix)) {
                           setSearchTermSuffix(next.slice(autoPrefix.length));
-                        } else if (!autoPrefix) {
-                          setSearchTermSuffix(next);
                         } else {
                           setSearchTermSuffix(next);
                         }
                       }}
-                      placeholder={autoGeneratePartNo ? 'Auto-generated… you can append text' : 'Type part # / search term'}
-                      className="w-48 p-2 border rounded bg-gray-700"
+                      placeholder={autoGeneratePartNo ? 'Auto-generated...' : 'Type search term'}
+                      className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-600 focus:border-blue-600 focus:ring-0 transition-colors font-mono text-sm"
                     />
                   </div>
                 </div>
                 
                 {/* --- RESTORED CONDITIONAL OPTIONS --- */}
-                {/* (Keeping all options exactly as is) */}
                 {partType === 'aluminum_sign' && (
-                    <div className="flex items-center">
-                        <label htmlFor="alGauge_options" className="w-48 text-left mr-4 font-semibold">Aluminum Gauge:</label>
-                        <select id="alGauge_options" value={alGauge} onChange={(e) => setAlGauge(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
+                    <div>
+                        <label htmlFor="alGauge_options" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Aluminum Gauge</label>
+                        <select id="alGauge_options" value={alGauge} onChange={(e) => setAlGauge(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
                             <option value=".024">.024</option><option value=".040">.040</option><option value=".050">.050</option><option value=".063">.063</option><option value=".080">.080</option><option value=".090">.090</option><option value=".125">.125</option>
                         </select>
                     </div>
                 )}
                 {partType === 'acm_sign' && (
-                     <div className="flex items-center">
-                        <label htmlFor="acm_options" className="w-48 text-left mr-4 font-semibold">ACM Sheet Size:</label>
-                        <select id="acm_options" value={acmSheetSize} onChange={(e) => setAcmSheetSize(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
+                     <div>
+                        <label htmlFor="acm_options" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">ACM Sheet Size</label>
+                        <select id="acm_options" value={acmSheetSize} onChange={(e) => setAcmSheetSize(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
                             <option value="96">3mm x 96in x 48in</option><option value="120">3mm x 120in x 60in</option>
                         </select>
                     </div>
                 )}
                  {partType === 'hdpe_sign' && (
-                     <div className="flex items-center">
-                        <label htmlFor="hdpe_options" className="w-48 text-left mr-4 font-semibold">HDPE Sheet Size:</label>
-                        <select id="hdpe_options" value={hdpeSheetSize} onChange={(e) => setHdpeSheetSize(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
+                     <div>
+                        <label htmlFor="hdpe_options" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">HDPE Sheet Size</label>
+                        <select id="hdpe_options" value={hdpeSheetSize} onChange={(e) => setHdpeSheetSize(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
                             <option value=".023">.023in x 45in x 24in</option><option value=".110_96">.110in x 48in x 96in</option><option value=".110_40">.110in x 48in x 40in</option><option value=".110_24">.110in x 48in x 24in</option>
                         </select>
                     </div>
                 )}
                 {partType === 'corrugated' && (
-                     <div className="flex items-center">
-                        <label htmlFor="corr_options" className="w-48 text-left mr-4 font-semibold">Corrugated Sheet Size:</label>
-                        <select id="corr_options" className="w-48 p-2 border rounded bg-gray-700 text-white" disabled><option value="4mm">4mm x 96in x 48in</option></select>
+                     <div>
+                        <label htmlFor="corr_options" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Corrugated Sheet Size</label>
+                        <select id="corr_options" className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-500 focus:border-blue-600 focus:ring-0" disabled><option value="4mm">4mm x 96in x 48in</option></select>
                     </div>
                 )}
                 {partType === 'digital_print' && (
-                    <div className="flex items-center">
-                        <label htmlFor="digital_print_options" className="w-48 text-left mr-4 font-semibold">Roll Width:</label>
-                        <select id="digital_print_options" value={digitalPrintRollWidth} onChange={(e) => setDigitalPrintRollWidth(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
-                            <option value="54">54"</option><option value="48">48"</option><option value="36">36"</option><option value="30">30"</option><option value="24">24"</option><option value="22">22"</option><option value="18">18" (HIP)</option><option value="16">16"</option>
-                        </select>
-                        <label htmlFor="includeBleed" className="ml-4 mr-2"><input type="checkbox" id="includeBleed" checked={includeBleed} onChange={(e) => setIncludeBleed(e.target.checked)} className="h-4 w-4 mr-2"/>Include Bleed</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                        <div>
+                            <label htmlFor="digital_print_options" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Roll Width</label>
+                            <select id="digital_print_options" value={digitalPrintRollWidth} onChange={(e) => setDigitalPrintRollWidth(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
+                                <option value="54">54"</option><option value="48">48"</option><option value="36">36"</option><option value="30">30"</option><option value="24">24"</option><option value="22">22"</option><option value="18">18" (HIP)</option><option value="16">16"</option>
+                            </select>
+                        </div>
+                        <div className="h-12 flex items-center">
+                            <label htmlFor="includeBleed" className="flex items-center gap-3 cursor-pointer group">
+                                <div className="relative flex items-center">
+                                    <input type="checkbox" id="includeBleed" checked={includeBleed} onChange={(e) => setIncludeBleed(e.target.checked)} 
+                                    className="peer h-5 w-5 bg-slate-950 border border-slate-700 checked:bg-blue-600 checked:border-blue-600 focus:ring-0 transition-colors"/>
+                                    <svg className="absolute w-3 h-3 text-white hidden peer-checked:block left-1 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="4" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Include Bleed</span>
+                            </label>
+                        </div>
                     </div>
                 )}
                 {partType === 'magnet' && (
-                    <div className="space-y-3">
-                         <div className="flex items-center">
-                            <label htmlFor="magnet_options" className="w-48 text-left mr-4 font-semibold">Magnet Roll Width:</label>
-                            <select id="magnet_options" value={magnetRollWidth} onChange={(e) => setMagnetRollWidth(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div>
+                            <label htmlFor="magnet_options" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Magnet Roll Width</label>
+                            <select id="magnet_options" value={magnetRollWidth} onChange={(e) => setMagnetRollWidth(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
                                 <option value="24">24"</option><option value="30">30"</option>
                             </select>
                         </div>
-                        <div className="flex items-center">
-                            <label htmlFor="magnet_thickness" className="w-48 text-left mr-4 font-semibold">Magnet Thickness:</label>
-                            <select id="magnet_thickness" value={magnetThickness} onChange={(e) => setMagnetThickness(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
+                        <div>
+                            <label htmlFor="magnet_thickness" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Magnet Thickness</label>
+                            <select id="magnet_thickness" value={magnetThickness} onChange={(e) => setMagnetThickness(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
                                 <option value="0.030">30 mil</option><option value="0.060">60 mil</option>
                             </select>
                         </div>
                     </div>
                 )}
                 {partType === 'opus_cut_decal' && (
-                    <div className="space-y-3">
-                         <div className="flex items-center">
-                            <label htmlFor="opusSheetWidth" className="w-48 text-left mr-4 font-semibold ">Sheet Width:</label>
-                            <input id="opusSheetWidth" type="number" value={opusSheetWidth} onChange={(e) => setOpusSheetWidth(e.target.value)} className="w-48 p-2 border rounded bg-gray-700"/>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div>
+                            <label htmlFor="opusSheetWidth" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sheet Width</label>
+                            <input id="opusSheetWidth" type="number" value={opusSheetWidth} onChange={(e) => setOpusSheetWidth(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0"/>
                         </div>
-                        <div className="flex items-center">
-                            <label htmlFor="opusSheetHeight" className="w-48 text-left mr-4 font-semibold">Sheet Height:</label>
-                            <input id="opusSheetHeight" type="number" value={opusSheetHeight} onChange={(e) => setOpusSheetHeight(e.target.value)} className="w-48 p-2 border rounded bg-gray-700"/>
+                        <div>
+                            <label htmlFor="opusSheetHeight" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sheet Height</label>
+                            <input id="opusSheetHeight" type="number" value={opusSheetHeight} onChange={(e) => setOpusSheetHeight(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0"/>
                         </div>
                     </div>
                 )}
                 {partType === 'bullet' && (
-                     <div className="space-y-3">
-                        <div className="flex items-center">
-                            <label htmlFor="sleeveLength" className="w-48 text-left mr-4 font-semibold">Sleeve Length:</label>
-                            <select id="sleeveLength" value={sleeveLength} onChange={(e) => setSleeveLength(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
-                                <option value="16">16in Sleeve</option><option value="22">22in Sleeve</option>
-                            </select>
+                     <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="sleeveLength" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sleeve Length</label>
+                                <select id="sleeveLength" value={sleeveLength} onChange={(e) => setSleeveLength(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
+                                    <option value="16">16in Sleeve</option><option value="22">22in Sleeve</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="tubeGauge" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tube Gauge</label>
+                                <select id="tubeGauge" value={tubeGauge} onChange={(e) => setTubeGauge(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
+                                    <option value="0.100">.100</option><option value="0.110">.110</option><option value="0.125">.125</option><option value="0.218">.218</option><option value="0.318">.318</option>
+                                </select>
+                            </div>
                         </div>
-                        <div className="flex items-center">
-                            <label htmlFor="tubeGauge" className="w-48 text-left mr-4 font-semibold">Tube Gauge:</label>
-                            <select id="tubeGauge" value={tubeGauge} onChange={(e) => setTubeGauge(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
-                                <option value="0.100">.100</option><option value="0.110">.110</option><option value="0.125">.125</option><option value="0.218">.218</option><option value="0.318">.318</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center">
-                            <label htmlFor="tubeLength" className="w-48 text-left mr-4 font-semibold">Tube Length:</label>
-                            <select id="tubeLength" value={tubeLength} onChange={(e) => setTubeLength(e.target.value)} className="w-48 p-2 border rounded bg-gray-700 text-white">
+                        <div>
+                            <label htmlFor="tubeLength" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tube Length</label>
+                            <select id="tubeLength" value={tubeLength} onChange={(e) => setTubeLength(e.target.value)} className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0">
                                 <option value="66">66in</option><option value="72">72in</option><option value="84">84in</option><option value="96">96in</option><option value="custom">Custom</option>
                             </select>
                         </div>
                         {tubeLength === 'custom' && (
-                            <div className="flex items-center">
-                                <label htmlFor="customLengthInput" className="w-48 text-left mr-4 font-semibold">Custom Length:</label>
-                                <input type="text" id="customLengthInput" value={customTubeLength} onChange={(e) => setCustomTubeLength(e.target.value)} placeholder="Enter custom length" className="w-48 p-2 border rounded bg-gray-700"/>
+                            <div>
+                                <label htmlFor="customLengthInput" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Custom Length</label>
+                                <input type="text" id="customLengthInput" value={customTubeLength} onChange={(e) => setCustomTubeLength(e.target.value)} placeholder="Enter custom length" className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0"/>
                             </div>
                         )}
-                        <div className="ml-[200px] grid grid-cols-2 gap-x-4 gap-y-2 w-max">
-                            <label className="flex items-center"><input type="checkbox" checked={includeDomeCapPlug} onChange={(e) => setIncludeDomeCapPlug(e.target.checked)} className="mr-2"/>Dome Cap Plug</label>
-                            <label className="flex items-center"><input type="checkbox" checked={includeSleeve} onChange={(e) => setIncludeSleeve(e.target.checked)} className="mr-2"/>Bullet Sleeve</label>
-                            <label className="flex items-center"><input type="checkbox" checked={includeT3Head} onChange={(e) => setIncludeT3Head(e.target.checked)} className="mr-2"/>T3 Head</label>
-                            <label className="flex items-center"><input type="checkbox" checked={includeRainCap} onChange={(e) => setIncludeRainCap(e.target.checked)} className="mr-2"/>Rain Cap</label>
-                            <label className="flex items-center"><input type="checkbox" checked={includeUChannel} onChange={(e) => setIncludeUChannel(e.target.checked)} className="mr-2"/>U-Channel</label>
+                        <div className="grid grid-cols-2 gap-4">
+                            {[
+                                { label: 'Dome Cap Plug', checked: includeDomeCapPlug, set: setIncludeDomeCapPlug },
+                                { label: 'Bullet Sleeve', checked: includeSleeve, set: setIncludeSleeve },
+                                { label: 'T3 Head', checked: includeT3Head, set: setIncludeT3Head },
+                                { label: 'Rain Cap', checked: includeRainCap, set: setIncludeRainCap },
+                                { label: 'U-Channel', checked: includeUChannel, set: setIncludeUChannel },
+                            ].map((opt, i) => (
+                                <label key={i} className="flex items-center gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center">
+                                        <input type="checkbox" checked={opt.checked} onChange={(e) => opt.set(e.target.checked)} 
+                                        className="peer h-5 w-5 bg-slate-950 border border-slate-700 checked:bg-blue-600 checked:border-blue-600 focus:ring-0 transition-colors"/>
+                                        <svg className="absolute w-3 h-3 text-white hidden peer-checked:block left-1 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="4" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">{opt.label}</span>
+                                </label>
+                            ))}
                         </div>
                     </div>
                 )}
                 
                 {/* Item Size Inputs */}
                 {partType !== 'bullet' && (
-                    <div className="space-y-3 pt-4 border-t mt-4">
-                        <div className="flex items-center">
-                            <label htmlFor="itemWidth" className="w-48 text-left mr-4 font-semibold">Item Size Width:</label>
-                            <input id="itemWidth" type="number" value={itemWidth} onChange={e => setItemWidth(e.target.value)} placeholder="Width in Inches" step="0.001" className="w-48 p-2 border rounded bg-gray-700" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-800">
+                        <div>
+                            <label htmlFor="itemWidth" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Item Width (in)</label>
+                            <input id="itemWidth" type="number" value={itemWidth} onChange={e => setItemWidth(e.target.value)} placeholder="0.00" step="0.001" className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0 text-lg font-mono" />
                         </div>
-                        <div className="flex items-center">
-                            <label htmlFor="itemHeight" className="w-48 text-left mr-4 font-semibold">Item Size Height:</label>
-                            <input id="itemHeight" type="number" value={itemHeight} onChange={e => setItemHeight(e.target.value)} placeholder="Height in Inches" step="0.001" className="w-48 p-2 border rounded bg-gray-700" />
+                        <div>
+                            <label htmlFor="itemHeight" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Item Height (in)</label>
+                            <input id="itemHeight" type="number" value={itemHeight} onChange={e => setItemHeight(e.target.value)} placeholder="0.00" step="0.001" className="w-full h-12 px-4 bg-slate-950 border border-slate-700 text-slate-100 focus:border-blue-600 focus:ring-0 text-lg font-mono" />
                         </div>
                     </div>
                 )}
             </div>
             
             {/* Action and Results */}
-            <div className="mt-6">
-                <button onClick={handleCalculate} className="ml-[200px] cursor-pointer text-white bg-blue-600 py-2 px-4 rounded hover:bg-blue-700">
+            <div className="mt-8 pt-6 border-t border-slate-800">
+                <button onClick={handleCalculate} className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm uppercase tracking-widest transition-colors shadow-lg shadow-blue-900/20 hover:shadow-blue-600/20">
                     {autoGeneratePartNo ? 'Calculate & Search' : 'Calculate'}
                 </button>
-                {error && <div className="mt-2 ml-[200px] font-bold text-red-600">{error}</div>}
+                {error && <div className="mt-4 p-4 bg-red-950/30 border border-red-900 text-red-400 font-mono text-sm">{error}</div>}
                 {results && <ResultsDisplay results={results} />}
             </div>
         </div>

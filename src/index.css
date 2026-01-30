@@ -1,14 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* Standard Dark Mode Base */
   color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #111827; /* Matches Tailwind gray-900 */
+  color: #f8fafc; /* slate-50 */
+  background-color: #020617; /* slate-950 */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -16,29 +15,46 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* SWISS STYLE RESET 
+  - Removes default rounded corners from inputs/buttons if not explicitly set
+  - Enforces sharp edges and borders
+*/
+
+input, select, textarea, button {
+  border-radius: 0 !important; /* Force square corners */
+  outline: none;
+}
+
+/* Custom Scrollbar for a technical feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a; 
+}
+::-webkit-scrollbar-thumb {
+  background: #334155; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; 
+}
+
 /* Links */
 a {
   font-weight: 500;
-  color: #60a5fa; /* Tailwind blue-400 */
-  text-decoration: inherit;
+  color: #3b82f6; /* blue-500 */
+  text-decoration: none;
   transition: color 0.2s;
 }
 a:hover {
-  color: #93c5fd; /* Tailwind blue-300 */
+  color: #60a5fa; /* blue-400 */
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
-/* CRITICAL FIX: 
-   Removed 'display: flex' and 'place-items: center'.
-   This allows the app to flow from top-to-bottom normally.
-*/
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #111827;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
 }
