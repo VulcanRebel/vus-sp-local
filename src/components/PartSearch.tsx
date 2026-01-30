@@ -204,7 +204,7 @@ export default function PartSearch({
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex gap-4 mb-6 items-end">
+      <div className="flex gap-4 mb-4 items-end">
         <div className="flex-1">
           <label className={STYLES.label}>Part Type:</label>
           <select
