@@ -48,7 +48,7 @@ function App() {
           {/* SEARCH */}
           <section id="searchWrap" className="col-span-12 lg:col-span-7 bg-slate-900 border border-slate-800 p-6">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 border-b border-slate-800 pb-2">
-              02 / Database Results
+              02 / Search Results
             </h2>
             <PartSearch
               prefillSearchTerm={searchPrefill}

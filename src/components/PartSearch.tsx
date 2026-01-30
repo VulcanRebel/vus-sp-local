@@ -3,6 +3,41 @@ import { useEffect, useState } from 'react';
 import { useLocalPartSearch } from '../hooks/useLocalPartSearch';
 import type { LocalSearchConfig } from '../hooks/useLocalPartSearch';
 
+// --- STYLES ---
+// Defined as constants to keep the JSX clean while maintaining the strict Swiss grid
+const STYLES = {
+    select: `
+        w-full h-10 px-3
+        bg-slate-950 border border-slate-700 
+        text-slate-100 text-sm 
+        focus:border-blue-600 focus:ring-0 
+        transition-colors rounded-none appearance-none cursor-pointer 
+        bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M6%208l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')] 
+        bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat
+    `,
+    input: `
+        w-full h-10 px-3 
+        bg-slate-950 border border-slate-700 
+        text-slate-100 placeholder-slate-600 text-sm font-mono
+        focus:border-blue-600 focus:ring-0 
+        transition-colors rounded-none
+    `,
+    label: `
+        block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1
+    `,
+    checkbox: `
+        peer h-4 w-4 bg-slate-950 border border-slate-700 
+        checked:bg-blue-600 checked:border-blue-600 
+        focus:ring-0 transition-colors rounded-none cursor-pointer
+    `,
+    button: `
+        w-full h-12 
+        bg-blue-600 hover:bg-blue-500 
+        text-white font-bold text-xs uppercase tracking-widest 
+        transition-colors shadow-none rounded-none cursor-pointer
+    `
+};
+
 // --- SEARCH CONFIG MAP ---
 const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
   // --- Signs ---
@@ -168,19 +203,14 @@ export default function PartSearch({
   };
 
   return (
-    <div className="p-5 max-w-4xl mx-auto mt-8 border-t">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Part Search (Local)</h2>
-        <div className="text-sm text-gray-600">Mode: Local Admin</div>
-      </div>
-
+    <div className="max-w-4xl mx-auto">
       <div className="flex gap-4 mb-6 items-end">
         <div className="flex-1">
-          <label className="block font-semibold mb-1">Part Type:</label>
+          <label className={STYLES.label}>Part Type:</label>
           <select
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
-            className="w-full p-2 border rounded bg-gray-700 text-white"
+            className={STYLES.select}
           >
             <option value="">-- Select Part Type --</option>
             {Object.keys(SEARCH_CONFIG_MAP).map((key) => (
@@ -192,7 +222,7 @@ export default function PartSearch({
         </div>
 
         <div className="flex-[2]">
-          <label className="block font-semibold mb-1">Part Name (Optional):</label>
+          <label className={STYLES.label}>Part Name (Optional):</label>
           <input
             type="text"
             value={searchName}
@@ -213,7 +243,7 @@ export default function PartSearch({
               }
             }}
             placeholder="Enter part name to filter"
-            className="w-full p-2 border rounded bg-gray-700 text-white"
+            className={STYLES.input}
           />
         </div>
 
@@ -231,16 +261,16 @@ export default function PartSearch({
 
       <div className="space-y-4">
         {results.map((part, index) => (
-          <div key={index} className="p-4 text-left border rounded shadow-sm text-sm">
+          <div key={index} className="pt-4 text-left border-t border-slate-800 shadow-sm text-sm">
             <div className="grid grid-cols-2 gap-2">
+              <p className="col-span-2">
+                <strong>Name:</strong> {part.Name || 'N/A'}
+              </p>              
               <p>
                 <strong>Part No:</strong> {part['Part No'] || 'N/A'}
               </p>
               <p>
                 <strong>Rev:</strong> {part.Rev || 'N/A'}
-              </p>
-              <p className="col-span-2">
-                <strong>Name:</strong> {part.Name || 'N/A'}
               </p>
               <p>
                 <strong>Old Part No:</strong> {part['Old Part No'] || 'N/A'}

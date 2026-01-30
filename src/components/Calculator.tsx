@@ -18,7 +18,7 @@ type CalculatorProps = {
 // Defined as constants to keep the JSX clean while maintaining the strict Swiss grid
 const STYLES = {
     select: `
-        w-full h-10 px-3 
+        w-full h-10 px-3
         bg-slate-950 border border-slate-700 
         text-slate-100 text-sm 
         focus:border-blue-600 focus:ring-0 
@@ -45,7 +45,7 @@ const STYLES = {
         w-full h-12 
         bg-blue-600 hover:bg-blue-500 
         text-white font-bold text-xs uppercase tracking-widest 
-        transition-colors shadow-none rounded-none
+        transition-colors shadow-none rounded-none cursor-pointer
     `
 };
 
