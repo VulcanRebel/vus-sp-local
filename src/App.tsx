@@ -10,6 +10,7 @@ function App() {
   const [searchPrefill, setSearchPrefill] = useState('');
   const [autoGenOn, setAutoGenOn] = useState(false);
   const [autoPartType, setAutoPartType] = useState('');
+  const [searchTrigger, setSearchTrigger] = useState(0);
   
   return (
     <main className="font-sans pb-20 bg-gray-900 min-h-screen text-white"> 
@@ -25,7 +26,8 @@ function App() {
           <Calculator
             onSearchTermChange={setSearchPrefill}
             onAutoGenerateChange={setAutoGenOn}
-            onPartTypeChange={setAutoPartType} // Wire up the Part Type change
+            onPartTypeChange={setAutoPartType}
+            onTriggerSearch={() => setSearchTrigger(prev => prev + 1)}
           />
         </div>
         
@@ -34,7 +36,8 @@ function App() {
           <PartSearch
             prefillSearchTerm={searchPrefill}
             autoGenerateOn={autoGenOn}
-            autoSelectedPartType={autoPartType} // Pass down the Part Type
+            autoSelectedPartType={autoPartType}
+            searchTrigger={searchTrigger}
           /> 
         </div>
 

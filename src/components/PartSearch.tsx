@@ -82,10 +82,16 @@ const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
 type PartSearchProps = {
   prefillSearchTerm?: string;
   autoGenerateOn?: boolean;
-  autoSelectedPartType?: string; // New prop for auto-selection
+  autoSelectedPartType?: string;
+  searchTrigger?: number; // New prop
 };
 
-export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = false, autoSelectedPartType = '' }: PartSearchProps) {
+export default function PartSearch({ 
+  prefillSearchTerm = '', 
+  autoGenerateOn = false, 
+  autoSelectedPartType = '',
+  searchTrigger = 0 
+}: PartSearchProps) {
 
   // --- MOCK AUTH STATE ---
   const user = { email: 'local-admin@vus.com', uid: 'local' }; 
@@ -94,17 +100,15 @@ export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = fa
   const [searchName, setSearchName] = useState('');
   const [searchNameSuffix, setSearchNameSuffix] = useState('');
   
-  // FIX: Sync Part Type automatically when Auto-Generate is ON
+  // 1. Sync Part Type automatically when Auto-Generate is ON
   useEffect(() => {
     if (autoGenerateOn && autoSelectedPartType && SEARCH_CONFIG_MAP[autoSelectedPartType]) {
       setSearchType(autoSelectedPartType);
     }
   }, [autoGenerateOn, autoSelectedPartType]);
 
-  // FIX: Update Search Name dynamically
-  // Removed the 'if (!prefillSearchTerm) return' guard clause.
-  // This allows the field to update even if the calculator temporarily sends an empty string,
-  // preventing the "lock" behavior when typing dimensions.
+  // 2. Update Search Name Input (BUT DO NOT TRIGGER SEARCH)
+  // This just keeps the input field in sync with the calculator
   useEffect(() => {
     if (!autoGenerateOn) return;
     setSearchName(`${prefillSearchTerm}${searchNameSuffix}`);
@@ -121,8 +125,6 @@ export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = fa
 
   // --- LOCAL SEARCH HOOK ---
   const selectedConfig = searchType ? SEARCH_CONFIG_MAP[searchType] : undefined;
-  
-  // Safe default
   const hookConfig = selectedConfig ?? { serverFilters: [] };
 
   const {
@@ -137,6 +139,19 @@ export default function PartSearch({ prefillSearchTerm = '', autoGenerateOn = fa
     searchName,
     targetCount: 100,
   });
+
+  // --- TRIGGER SEARCH ONLY ON SIGNAL ---
+  // This fixes "Search-As-You-Type" issue. 
+  // We wait for the user to click "Calculate & Search" (which increments searchTrigger)
+  useEffect(() => {
+    if (autoGenerateOn && searchTrigger > 0) {
+      // Ensure we have a valid config before searching
+      if (searchType && SEARCH_CONFIG_MAP[searchType]) {
+        // We call search(), which uses the *current* state of searchName and searchType
+        search();
+      }
+    }
+  }, [searchTrigger]); // Only depend on searchTrigger, not autoGenerateOn or searchType changes
 
   // --- ACTIONS ---
   const handleSearchClick = () => {

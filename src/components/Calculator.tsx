@@ -10,10 +10,16 @@ type CalculationResults = { [key: string]: { value: number | string; label: stri
 type CalculatorProps = {
   onSearchTermChange?: (value: string) => void;
   onAutoGenerateChange?: (on: boolean) => void;
-  onPartTypeChange?: (type: string) => void; // Added prop for fixing bug #2
+  onPartTypeChange?: (type: string) => void;
+  onTriggerSearch?: () => void;
 };
 
-export default function Calculator({ onSearchTermChange, onAutoGenerateChange, onPartTypeChange }: CalculatorProps) {
+export default function Calculator({ 
+  onSearchTermChange, 
+  onAutoGenerateChange, 
+  onPartTypeChange,
+  onTriggerSearch 
+}: CalculatorProps) {
     // --- STATE ---
     const [partGroup, setPartGroup] = useState<PartGroup>('lineMarkers');
     const [partType, setPartType] = useState('bullet');
@@ -40,27 +46,21 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
     const [results, setResults] = useState<CalculationResults | null>(null);
     const [error, setError] = useState<string>('');
 
-        // --- LIVE PART SEARCH ---
+    // --- LIVE PART SEARCH ---
     const [autoGeneratePartNo, setAutoGeneratePartNo] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    
-    // When auto-generate is ON, we keep the generated prefix authoritative
-    // and store whatever the user types AFTER the prefix here.
     const [searchTermSuffix, setSearchTermSuffix] = useState('');
 
     const formatGauge = (g: string) => {
-      // ".040" -> "040", ".024" -> "024", ".125" -> "125"
       const n = parseFloat(g);
       if (Number.isNaN(n)) return '';
       return String(Math.round(n * 1000)).padStart(3, '0');
     };
     
     const formatDim = (v: string) => {
-      // "10" -> "10", "10.0" -> "10", "10.500" -> "10.5"
       const n = parseFloat(v);
       if (Number.isNaN(n)) return '';
       if (Number.isInteger(n)) return String(n);
-      // trim trailing zeros
       return String(n).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
     };
     
@@ -68,39 +68,41 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
       const w = formatDim(itemWidth);
       const h = formatDim(itemHeight);
     
-      // 5) Markers > Bullet Markers = "[height]"
-      // In your UI, bullet uses tubeLength / customTubeLength (not itemHeight).
       if (partGroup === 'lineMarkers' && partType === 'bullet') {
         const length = tubeLength === 'custom' ? formatDim(customTubeLength) : formatDim(tubeLength);
         return length ? `${length}` : '';
       }
     
-      // Anything that needs width/height: if missing, don't generate
       if (!w || !h) return '';
     
-      // 1) Signs > Aluminum Sign = "[gauge]x[width]x[height]"
+      // Aluminum
       if (partGroup === 'signs' && partType === 'aluminum_sign') {
         const g = formatGauge(alGauge);
         return g ? `${g}x${w}x${h}` : '';
       }
+      
+      // ACM - Uses same format as Aluminum often, or just 3mmxWxH
+      // Based on your search config map: acm_sign uses "3mm" as keyword
+      if (partGroup === 'signs' && partType === 'acm_sign') {
+         return `3mmx${w}x${h}`;
+      }
     
-      // 2) Signs > HDPE = "[gauge]x[width]x[height]" where gauge depends on HDPE Sheet Size
+      // HDPE
       if (partGroup === 'signs' && partType === 'hdpe_sign') {
         const g = hdpeSheetSize === '.023' ? '023' : '110';
         return `${g}x${w}x${h}`;
       }
     
-      // 3) Signs > Corrugated = "[width]x[height]"
+      // Corrugated
       if (partGroup === 'signs' && partType === 'corrugated') {
         return `${w}x${h}`;
       }
     
-      // 4) Decals = "[width]x[height]"
+      // Decals
       if (partGroup === 'decals') {
         return `${w}x${h}`;
       }
     
-      // Default: don't auto-generate for other part groups/types
       return '';
     }, [
       partGroup,
@@ -122,12 +124,9 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
 
     useEffect(() => {
         setResults(null); setError('');
-        
-        // Fix #2: Notify parent when Part Type changes
         onPartTypeChange?.(partType);
     }, [partType, onPartTypeChange]);
 
-    // --- NEW EFFECTS for SEARCH POPULATE
     useEffect(() => {
       if (!autoGeneratePartNo) return;
     
@@ -139,7 +138,6 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
     useEffect(() => {
       if (!autoGeneratePartNo) return;
       if (!autoPrefix) {
-        // If we can’t generate a prefix yet, just show what user typed
         setSearchTerm(searchTermSuffix);
       }
     }, [autoGeneratePartNo, autoPrefix, searchTermSuffix]);
@@ -307,6 +305,11 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
             }
         }
         setResults(calculatedResults);
+
+        // Auto-Search trigger
+        if (autoGeneratePartNo && onTriggerSearch) {
+            onTriggerSearch();
+        }
     };
     
     // --- RENDER ---
@@ -332,7 +335,7 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
                 {/* --- LIVE PART SEARCH UI --- */}
                 <div className="space-y-3 pt-4 border-t mt-4">
                   <div className="flex items-center">
-                    <label className="w-48 text-left mr-4 font-semibold">Auto-Generate Part #:</label>
+                    <label className="w-48 text-left mr-4 font-semibold">Auto-Search:</label>
                     <label className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -345,7 +348,7 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
                           if (on) {
                             setSearchTermSuffix('');
                             setSearchTerm(autoPrefix);
-                            onSearchTermChange?.(autoPrefix); // push immediately
+                            onSearchTermChange?.(autoPrefix);
                           }
                         }}
                         className="h-4 w-4"
@@ -363,20 +366,15 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
                         const next = e.target.value;
                 
                         if (!autoGeneratePartNo) {
-                          // OFF: user has full control; never overwritten by dimension changes
                           setSearchTerm(next);
                           return;
                         }
                 
-                        // ON: keep prefix authoritative, let user edit what's after it
                         if (autoPrefix && next.startsWith(autoPrefix)) {
                           setSearchTermSuffix(next.slice(autoPrefix.length));
                         } else if (!autoPrefix) {
-                          // no prefix yet; treat entire input as suffix
                           setSearchTermSuffix(next);
                         } else {
-                          // user tried editing the prefix; we keep it locked and treat edit as suffix
-                          // (this honors "Allow the user to add" without letting the prefix drift)
                           setSearchTermSuffix(next);
                         }
                       }}
@@ -387,6 +385,7 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
                 </div>
                 
                 {/* --- RESTORED CONDITIONAL OPTIONS --- */}
+                {/* (Keeping all options exactly as is) */}
                 {partType === 'aluminum_sign' && (
                     <div className="flex items-center">
                         <label htmlFor="alGauge_options" className="w-48 text-left mr-4 font-semibold">Aluminum Gauge:</label>
@@ -507,7 +506,9 @@ export default function Calculator({ onSearchTermChange, onAutoGenerateChange, o
             
             {/* Action and Results */}
             <div className="mt-6">
-                <button onClick={handleCalculate} className="ml-[200px] cursor-pointer text-white bg-blue-600 py-2 px-4 rounded hover:bg-blue-700">Calculate</button>
+                <button onClick={handleCalculate} className="ml-[200px] cursor-pointer text-white bg-blue-600 py-2 px-4 rounded hover:bg-blue-700">
+                    {autoGeneratePartNo ? 'Calculate & Search' : 'Calculate'}
+                </button>
                 {error && <div className="mt-2 ml-[200px] font-bold text-red-600">{error}</div>}
                 {results && <ResultsDisplay results={results} />}
             </div>
