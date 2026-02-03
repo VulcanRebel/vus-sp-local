@@ -52,13 +52,13 @@ export default function DataImporter({ onImportComplete }: { onImportComplete?: 
   };
 
   return (
-    <div className="mb-8">
+    <div >
       {/* Updated Button Styling to match primary actions */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded shadow-md transition-colors flex items-center gap-2"
+        className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-widest transition-colors shadow-none rounded-none cursor-pointer flex items-center gap-2"
       >
-        <span>{isOpen ? '✕ Close Importer' : '📂 Import PLEX Data'}</span>
+        <span>{isOpen ? '✕ CLOSE IMPORTER' : '📂 IMPORT PLEX DATA'}</span>
       </button>
 
       {isOpen && (

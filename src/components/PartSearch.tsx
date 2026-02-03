@@ -250,7 +250,7 @@ export default function PartSearch({
         <button
           onClick={handleSearchClick}
           disabled={loading}
-          className="bg-blue-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 h-10"
+          className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-widest transition-colors shadow-none rounded-none cursor-pointer disabled:bg-gray-400"
         >
           {loading ? 'Searching...' : 'Search'}
         </button>
@@ -303,7 +303,7 @@ export default function PartSearch({
         <button
           onClick={loadMore}
           disabled={loading}
-          className="mt-6 cursor-pointer w-full bg-blue-600 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          className={`${STYLES.button} mt-6 disabled:bg-gray-400`}
         >
           {loading ? 'Loading...' : 'Load More'}
         </button>
