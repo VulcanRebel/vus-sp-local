@@ -1,121 +1,97 @@
 // server/index.ts
 import express from 'express';
 import cors from 'cors';
-import db from './db';
+import db from './db.js';
 
 const app = express();
 const port = 3000;
-const host = '127.0.0.1'; // Localhost only
+const host = '127.0.0.1'; // Reverted to Localhost only
 
 app.use(cors());
-// INCREASE LIMIT for large JSON imports
+// INCREASE LIMIT for large JSON imports (needed for PLEX data)
 app.use(express.json({ limit: '50mb' })); 
 
-// --- POST: Advanced Search ---
+// --- API ROUTES ---
+
+// 1. ADVANCED SEARCH
+// Optimized for local performance and specific PLEX field handling
 app.post('/api/parts/search', (req, res) => {
   try {
-    const { 
-      q = '', 
-      limit = 100, 
-      offset = 0, 
-      config 
-    } = req.body;
-
+    const { q = '', limit = 100, offset = 0, config } = req.body;
     let sql = 'SELECT * FROM parts WHERE 1=1';
     const params: (string | number)[] = [];
 
-    // 1. Text Search (Name)
+    // Text Search (Main Name)
     if (q) {
       sql += ' AND name LIKE ?';
       params.push(`%${q}%`);
     }
 
-    // 2. Server Filters
+    // Category Filters (Part Group, Part Type)
     if (config?.serverFilters && Array.isArray(config.serverFilters)) {
       config.serverFilters.forEach((filter: any) => {
         const { field, op, value } = filter;
-        let sqlOp = '=';
-        if (op === '>=') sqlOp = '>=';
-        if (op === '<=') sqlOp = '<=';
-        if (op === '>') sqlOp = '>';
-        if (op === '<') sqlOp = '<';
-        
-        sql += ` AND json_extract(data, '$."' || ? || '"') ${sqlOp} ?`;
+        // Logic to handle spaces in JSON keys: "$.\"Part Group\""
+        sql += ` AND json_extract(data, '$.\"' || ? || '\"') ${op} ?`;
         params.push(field, value);
       });
     }
 
-    // 3. Client Filters (Optimized to Server)
+    // Sub-Filters (The "Coroplast" logic)
     if (config?.clientFilterField && config?.clientFilterValues?.length > 0) {
       const field = config.clientFilterField;
       const values = config.clientFilterValues;
-      const placeholders = values.map(() => '?').join(',');
-      sql += ` AND json_extract(data, '$."' || ? || '"') IN (${placeholders})`;
-      params.push(field, ...values);
+      
+      const subConditions = values.map(() => `json_extract(data, '$.\"' || ? || '\"') LIKE ?`).join(' OR ');
+      sql += ` AND (${subConditions})`;
+      
+      values.forEach((val: string) => {
+        params.push(field, `%${val}%`);
+      });
     }
 
-    // 4. Pagination
     sql += ' ORDER BY name ASC LIMIT ? OFFSET ?';
     params.push(Number(limit), Number(offset));
 
-    const stmt = db.prepare(sql);
-    const rows = stmt.all(...params);
-
-    const results = rows.map((row: any) => {
-      const jsonData = JSON.parse(row.data || '{}');
-      return { id: row.id, Name: row.name, ...jsonData };
-    });
+    const rows = db.prepare(sql).all(...params);
+    const results = rows.map((row: any) => ({
+      id: row.id,
+      Name: row.name,
+      ...JSON.parse(row.data || '{}')
+    }));
 
     res.json(results);
-
   } catch (error: any) {
-    console.error(error);
+    console.error("Search API Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// --- BULK IMPORT (New!) ---
+// 2. BULK IMPORT (From PLEX JSON)
 app.post('/api/parts/import', (req, res) => {
   const partsArray = req.body;
-
-  if (!Array.isArray(partsArray)) {
-    res.status(400).json({ error: 'Expected an array of parts' });
-    return;
-  }
+  if (!Array.isArray(partsArray)) return res.status(400).json({ error: 'Expected array' });
 
   try {
     const insert = db.prepare('INSERT INTO parts (name, type, data) VALUES (?, ?, ?)');
-
-    // Transaction makes bulk insert 100x faster
     const importTransaction = db.transaction((parts) => {
       for (const part of parts) {
-        // AUTO-MAP: Try to find a Name, or fallback to Part No, or Unknown
-        const name = part.Name || part['Part Name'] || part['Part No'] || 'Unknown Part';
-        
-        // AUTO-MAP: Try to find a Type
+        const name = part.Name || part['Part Name'] || part['Part No'] || 'Unknown';
         const type = part['Part Type'] || part.Type || 'misc';
-
-        // Store the raw object in JSON
         insert.run(name, type, JSON.stringify(part));
       }
     });
-
     importTransaction(partsArray);
-
     res.json({ success: true, count: partsArray.length });
   } catch (error: any) {
-    console.error('Import Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// --- SINGLE INSERT ---
+// 3. SINGLE INSERT (Manual Form)
 app.post('/api/parts', (req, res) => {
   const { Name, type, ...rest } = req.body;
-  if (!Name) {
-     res.status(400).json({ error: 'Name is required' });
-     return;
-  }
+  if (!Name) return res.status(400).json({ error: 'Name is required' });
   try {
     const stmt = db.prepare('INSERT INTO parts (name, type, data) VALUES (?, ?, ?)');
     const info = stmt.run(Name, type || 'misc', JSON.stringify(rest));
@@ -126,5 +102,5 @@ app.post('/api/parts', (req, res) => {
 });
 
 app.listen(port, host, () => {
-  console.log(`Local Server running at http://${host}:${port}`);
+  console.log(`Local Internal Server running at http://${host}:${port}`);
 });
