@@ -273,13 +273,12 @@ export default function PartSearch({
   // We wait for the user to click "Calculate & Search" (which increments searchTrigger)
   useEffect(() => {
     if (autoGenerateOn && searchTrigger > 0) {
-      // Ensure we have a valid config before searching
-      if (searchType && SEARCH_CONFIG_MAP[searchType]) {
-        // We call search(), which uses the *current* state of searchName and searchType
+      // ALLOW 'all' to pass through, otherwise check if it's a valid config map key
+      if (searchType === 'all' || (searchType && SEARCH_CONFIG_MAP[searchType])) {
         search();
       }
     }
-  }, [searchTrigger]); // Only depend on searchTrigger, not autoGenerateOn or searchType changes
+  }, [searchTrigger]); 
 
   // --- ACTIONS ---
   const handleSearchClick = () => {
@@ -290,7 +289,8 @@ export default function PartSearch({
       return;
     }
 
-    if (!SEARCH_CONFIG_MAP[searchType]) {
+    // Only throw the "No data" error if they aren't trying to global search 'all'
+    if (searchType !== 'all' && !SEARCH_CONFIG_MAP[searchType]) {
       setUiError('No data available for this part type.');
       return;
     }
@@ -308,7 +308,8 @@ export default function PartSearch({
             onChange={(e) => setSearchType(e.target.value)}
             className={STYLES.select}
           >
-            <option value="" className="font-bold">-- ALL --</option>
+            {/* Give this a concrete value of "all" instead of an empty string */}
+            <option value="all" className="font-bold">-- ALL --</option>
             {CATEGORY_ORDER.map((categoryName) => (
               <optgroup key={categoryName} label={categoryName} className="font-bold text-slate-400 bg-slate-900">
                   {Object.entries(SEARCH_CONFIG_MAP)
@@ -326,7 +327,7 @@ export default function PartSearch({
 
         <div className="flex-[2]">
           <label className={STYLES.label}>Part Name (Optional):</label>
-          <input
+<input
             type="text"
             value={searchName}
             onChange={(e) => {
@@ -343,6 +344,12 @@ export default function PartSearch({
                 setSearchNameSuffix(next);
               } else {
                 setSearchNameSuffix(next);
+              }
+            }}
+            // NEW: Listen for the Enter key to instantly trigger the search
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearchClick();
               }
             }}
             placeholder="Enter part name to filter"
