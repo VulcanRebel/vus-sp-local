@@ -3,6 +3,12 @@ import { useEffect, useState } from 'react';
 import { useLocalPartSearch } from '../hooks/useLocalPartSearch';
 import type { LocalSearchConfig } from '../hooks/useLocalPartSearch';
 
+// Extend the imported config to include our UI grouping details
+type ConfigWithUI = LocalSearchConfig & {
+  uiCategory: string;
+  uiLabel: string;
+};
+
 // --- STYLES ---
 // Defined as constants to keep the JSX clean while maintaining the strict Swiss grid
 const STYLES = {
@@ -39,9 +45,12 @@ const STYLES = {
 };
 
 // --- SEARCH CONFIG MAP ---
-const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
-  // --- Signs ---
+const SEARCH_CONFIG_MAP: Record<string, ConfigWithUI> = {
+
+  // --- SIGNS ---
   hdpe_sign: {
+    uiCategory: 'SIGNS',
+    uiLabel: 'HDPE Sign',
     serverFilters: [
       { field: 'Part Group', op: '==', value: 'Signs' },
       { field: 'Grade', op: '==', value: 'HDPE' },
@@ -50,6 +59,8 @@ const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
     clientFilterValues: ['Small Signs', 'Large Signs'],
   },
   acm_sign: {
+    uiCategory: 'SIGNS',
+    uiLabel: 'ACM Sign',
     serverFilters: [
       { field: 'Part Group', op: '==', value: 'Signs' },
       { field: 'Name', op: '>=', value: '3mm' },
@@ -59,60 +70,145 @@ const SEARCH_CONFIG_MAP: Record<string, LocalSearchConfig> = {
     clientFilterValues: ['Small Signs', 'Large Signs'],
   },
   aluminum_sign: {
+    uiCategory: 'SIGNS',
+    uiLabel: 'Aluminum Sign',
     serverFilters: [{ field: 'Part Group', op: '==', value: 'Signs' }],
   },
+
+  // --- DECAL/MEDIA ---
+  magnet: {
+    uiCategory: 'DECAL/MEDIA',
+    uiLabel: 'Magnet',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Signs' },
+      { field: 'Part Type', op: '==', value: 'Decal/Media' },
+    ],
+    clientFilterField: 'Name',
+    clientFilterValues: ['MAGNET', 'Magnet', 'magnet'],
+  },
+  opus_cut_decal: {
+    uiCategory: 'DECAL/MEDIA',
+    uiLabel: 'OPUS Cut Decal',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Signs' },
+      { field: 'Part Type', op: '==', value: 'Decal/Media' },
+    ],
+    clientFilterField: 'Name',
+    clientFilterValues: ['OPUS', 'Opus', 'opus', 'PMPS', 'pmps'],
+  },
+  banner: {
+    uiCategory: 'DECAL/MEDIA',
+    uiLabel: 'Banner',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Signs' },
+      { field: 'Part Type', op: '==', value: 'Decal/Media' },
+    ],
+    clientFilterField: 'Name',
+    clientFilterValues: ['BANNER', 'Banner', 'banner'],
+  },
+  digital_print: {
+    uiCategory: 'DECAL/MEDIA',
+    uiLabel: 'Digital Print',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Signs' },
+      { field: 'Part Type', op: '==', value: 'Decal/Media' },
+    ],
+    clientFilterField: 'Rev',
+    clientFilterValues: ['EFI-30F', 'EFI', 'ROL'],
+  },
+  screenDecal: {
+    uiCategory: 'DECAL/MEDIA',
+    uiLabel: 'Screen Decal',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Signs' },
+      { field: 'Part Type', op: '==', value: 'Decal/Media' },
+    ],
+    clientFilterField: 'Rev',
+    clientFilterValues: ['SCN'],
+  },
+
+  // --- MARKERS ---
+  drv: { 
+    uiCategory: 'MARKERS',
+    uiLabel: 'DRV',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Markers' },
+      { field: 'Part Type', op: '==', value: 'DRV' }
+    ] 
+  },  
+  bullet_head: {
+    uiCategory: 'MARKERS',
+    uiLabel: 'Bullet Head',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Markers' },
+      { field: 'Part Type', op: '==', value: 'Bullet Head' }
+    ]
+  },  
+  bullet: { 
+    uiCategory: 'MARKERS',
+    uiLabel: 'Bullet Marker',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Markers' },      
+      { field: 'Part Type', op: '==', value: 'Bullet Marker' }
+    ] 
+  },
+  wrap_sign_marker: { 
+    uiCategory: 'MARKERS',
+    uiLabel: 'Wrap Sign Marker',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Markers' },
+      { field: 'Part Type', op: '==', value: 'Wrap Sign Marker' }
+    ]
+  },
+  h41_marker: { 
+    uiCategory: 'MARKERS',
+    uiLabel: 'H41 Marker',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Markers' },
+      { field: 'Part Type', op: '==', value: 'H41 Marker' }
+    ]
+  },
+  delta: { 
+    uiCategory: 'MARKERS',
+    uiLabel: 'Delta Marker',
+    serverFilters: [
+      { field: 'Part Group', op: '==', value: 'Markers' },      
+      { field: 'Part Type', op: '==', value: 'Delta Marker' }
+    ] 
+  },
+
+ // --- TEMPORARY MARKINGS ---
   corrugated: {
+    uiCategory: 'TEMPORARY MARKINGS',
+    uiLabel: 'Corrugated',
     serverFilters: [
       { field: 'Part Group', op: '==', value: 'Signs' },
       { field: 'Part Type', op: '==', value: 'Temporary Markings' },
     ],
     clientFilterField: 'Name',
-    clientFilterValues: ['Coroplast'],
+    clientFilterValues: ['Coroplast', 'Coro', 'Corrugated'],
   },
-
-  // --- Decals ---
-  magnet: {
+  hdpe_tags: {
+    uiCategory: 'TEMPORARY MARKINGS',
+    uiLabel: 'HDPE Tags',
     serverFilters: [
       { field: 'Part Group', op: '==', value: 'Signs' },
-      { field: 'Part Type', op: '==', value: 'Decal/Media' },
+      { field: 'Part Type', op: '==', value: 'Temporary Markings' },
     ],
     clientFilterField: 'Name',
-    clientFilterValues: ['magnet'],
+    clientFilterValues: ['Tag', 'Tags'],
   },
-  opus_cut_decal: {
+  buy_resell: {
+    uiCategory: 'TEMPORARY MARKINGS',
+    uiLabel: 'Buy Resell',
     serverFilters: [
-      { field: 'Part Group', op: '==', value: 'Signs' },
-      { field: 'Part Type', op: '==', value: 'Decal/Media' },
-    ],
-    clientFilterField: 'Name',
-    clientFilterValues: ['opus', 'pmps'],
+      { field: 'Part Status', op: '==', value: 'Buy Resell' },
+    ]
   },
-  banner: {
-    serverFilters: [
-      { field: 'Part Group', op: '==', value: 'Signs' },
-      { field: 'Part Type', op: '==', value: 'Decal/Media' },
-    ],
-    clientFilterField: 'Name',
-    clientFilterValues: ['banner'],
-  },
-  digital_print: {
-    serverFilters: [
-      { field: 'Part Group', op: '==', value: 'Signs' },
-      { field: 'Part Type', op: '==', value: 'Decal/Media' },
-    ],
-  },
-  screenDecal: {
-    serverFilters: [
-      { field: 'Part Group', op: '==', value: 'Decals' },
-      { field: 'Part Type', op: '==', value: 'Screen Decal' },
-    ],
-  },
-
-  // --- Other Groups ---
-  delta: { serverFilters: [{ field: 'Part Group', op: '==', value: 'Deltas' }] },
-  bullet: { serverFilters: [{ field: 'Part Group', op: '==', value: 'Bullets' }] },
-  drv: { serverFilters: [{ field: 'Part Group', op: '==', value: 'DRVs' }] },
 };
+
+// We use a simple array just to enforce the top-to-bottom order of the groups in the UI
+const CATEGORY_ORDER = ['SIGNS', 'TEMPORARY MARKINGS', 'DECAL/MEDIA', 'MARKERS'];
 
 type PartSearchProps = {
   prefillSearchTerm?: string;
@@ -212,11 +308,18 @@ export default function PartSearch({
             onChange={(e) => setSearchType(e.target.value)}
             className={STYLES.select}
           >
-            <option value="">-- Select Part Type --</option>
-            {Object.keys(SEARCH_CONFIG_MAP).map((key) => (
-              <option key={key} value={key}>
-                {key.replace(/_/g, ' ').toUpperCase()}
-              </option>
+            <option value="" className="font-bold">-- ALL --</option>
+            {CATEGORY_ORDER.map((categoryName) => (
+              <optgroup key={categoryName} label={categoryName} className="font-bold text-slate-400 bg-slate-900">
+                  {Object.entries(SEARCH_CONFIG_MAP)
+                      .filter(([_, config]) => config.uiCategory === categoryName)
+                      .map(([key, config]) => (
+                          <option key={key} value={key} className="font-normal text-slate-100 bg-slate-950">
+                              {config.uiLabel}
+                          </option>
+                      ))
+                  }
+              </optgroup>
             ))}
           </select>
         </div>
