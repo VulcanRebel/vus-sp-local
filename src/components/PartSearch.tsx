@@ -364,7 +364,7 @@ export default function PartSearch({
           disabled={loading}
           className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-widest transition-colors shadow-none rounded-none cursor-pointer disabled:bg-gray-400"
         >
-          {loading ? 'Searching...' : 'Search'}
+          Search
         </button>
       </div>
 
@@ -417,7 +417,7 @@ export default function PartSearch({
           disabled={loading}
           className={`${STYLES.button} mt-6 disabled:bg-gray-400`}
         >
-          {loading ? 'Loading...' : 'Load More'}
+          Load More
         </button>
       )}
     </div>
