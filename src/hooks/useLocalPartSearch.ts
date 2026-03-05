@@ -1,21 +1,14 @@
-import { useCallback, useState } from "react";
+import { useState, useCallback } from 'react';
 
-// Re-using your existing interface structure
 export interface LocalSearchConfig {
   serverFilters: {
     field: string;
     op: string;
-    value: string;
+    value: string | number;
   }[];
   clientFilterField?: string;
   clientFilterValues?: string[];
 }
-
-type PartData = {
-  id: number;
-  Name: string;
-  [key: string]: any;
-};
 
 export function useLocalPartSearch({
   config,
@@ -26,48 +19,57 @@ export function useLocalPartSearch({
   searchName: string;
   targetCount?: number;
 }) {
-  const [results, setResults] = useState<PartData[]>([]);
+  const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string>('');
+  const [hasMore, setHasMore] = useState(false);
   const [offset, setOffset] = useState(0);
 
   const runFetch = useCallback(
-    async (mode: "fresh" | "more") => {
+    async (mode: 'fresh' | 'more') => {
       setLoading(true);
-      setError("");
+      setError('');
       
-      const currentOffset = mode === "fresh" ? 0 : offset;
+      const currentOffset = mode === 'fresh' ? 0 : offset;
 
       try {
-        const response = await fetch(`http://127.0.0.1:3000/api/parts/search`, {
+        // Explicitly pointing to the local Node.js server
+        const response = await fetch('http://127.0.0.1:3000/api/parts/search', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
-            q: searchName,
+            query: searchName,
+            config: {
+              ...config,
+              clientFilterField: config.clientFilterField,
+              clientFilterValues: config.clientFilterValues
+            },
             limit: targetCount,
             offset: currentOffset,
-            config: config // Send the full config to the server
-          })
+          }),
         });
-        
-        if (!response.ok) throw new Error('Failed to fetch from local server');
-        
-        const data = await response.json();
 
-        if (mode === "fresh") {
-          setResults(data);
-          setOffset(data.length);
-        } else {
-          setResults((prev) => [...prev, ...data]);
-          setOffset((prev) => prev + data.length);
+        if (!response.ok) {
+          throw new Error(`Search failed: ${response.statusText}`);
         }
 
-        setHasMore(data.length === targetCount);
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+        
+        if (mode === 'fresh') {
+          setResults(items);
+          setOffset(items.length);
+        } else {
+          setResults((prev) => [...prev, ...items]);
+          setOffset((prev) => prev + items.length);
+        }
 
+        setHasMore(items.length === targetCount);
       } catch (err: any) {
-        console.error("Local search error:", err);
-        setError(err.message);
+        setError(err.message || 'An error occurred during the search.');
+        console.error('Search Hook Error:', err);
       } finally {
         setLoading(false);
       }
@@ -75,8 +77,8 @@ export function useLocalPartSearch({
     [config, searchName, targetCount, offset]
   );
 
-  const search = useCallback(() => runFetch("fresh"), [runFetch]);
-  const loadMore = useCallback(() => runFetch("more"), [runFetch]);
+  const search = useCallback(() => runFetch('fresh'), [runFetch]);
+  const loadMore = useCallback(() => runFetch('more'), [runFetch]);
 
   return {
     results,
