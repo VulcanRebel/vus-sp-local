@@ -40,7 +40,7 @@ export function useLocalPartSearch({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            query: searchName,
+            q: searchName,
             config: {
               ...config,
               clientFilterField: config.clientFilterField,

@@ -248,7 +248,7 @@ export default function PartSearch({
     setSearchNameSuffix('');
   }, [autoGenerateOn]);
   
-  const [searchType, setSearchType] = useState('');
+  const [searchType, setSearchType] = useState('all');
   const [uiError, setUiError] = useState('');
 
   // --- LOCAL SEARCH HOOK ---
@@ -327,7 +327,7 @@ export default function PartSearch({
 
         <div className="flex-[2]">
           <label className={STYLES.label}>Part Name (Optional):</label>
-<input
+          <input
             type="text"
             value={searchName}
             onChange={(e) => {
@@ -338,13 +338,15 @@ export default function PartSearch({
                 return;
               }
         
+              let newSuffix = next;
               if (prefillSearchTerm && next.startsWith(prefillSearchTerm)) {
-                setSearchNameSuffix(next.slice(prefillSearchTerm.length));
-              } else if (!prefillSearchTerm) {
-                setSearchNameSuffix(next);
-              } else {
-                setSearchNameSuffix(next);
+                newSuffix = next.slice(prefillSearchTerm.length);
               }
+              
+              setSearchNameSuffix(newSuffix);
+              // INSTANT SYNC: Don't wait for the useEffect, update the main search term immediately 
+              // so the Enter key has the absolute newest text.
+              setSearchName(`${prefillSearchTerm}${newSuffix}`); 
             }}
             // NEW: Listen for the Enter key to instantly trigger the search
             onKeyDown={(e) => {
