@@ -33,8 +33,12 @@ export function useLocalPartSearch({
       const currentOffset = mode === 'fresh' ? 0 : offset;
 
       try {
-        // Explicitly pointing to the local Node.js server
-        const response = await fetch('http://127.0.0.1:3000/api/parts/search', {
+        // import.meta.env.DEV is true on your office PC, false on Vercel
+        const API_URL = import.meta.env.DEV 
+          ? '[http://127.0.0.1:3000/api/parts/search](http://127.0.0.1:3000/api/parts/search)' 
+          : '/api/parts/search';
+          
+        const response = await fetch(API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
