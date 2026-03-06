@@ -35,7 +35,7 @@ export function useLocalPartSearch({
       try {
         // import.meta.env.DEV is true on your office PC, false on Vercel
         const API_URL = import.meta.env.DEV 
-          ? '[http://127.0.0.1:3000/api/parts/search](http://127.0.0.1:3000/api/parts/search)' 
+          ? 'http://127.0.0.1:3000/api/parts/search' 
           : '/api/parts/search';
           
         const response = await fetch(API_URL, {

@@ -1,0 +1,229 @@
+[
+  {
+    "Part No": "HDP-01",
+    "Name": ".110 x10\"x7\" B/W HDPE Sign - Do Not Block The Batcave",
+    "Part Group": "Signs",
+    "Part Type": "Small Signs",
+    "Grade": "HDPE",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "HDP-02",
+    "Name": ".110 x10\"x7\" BL,B/W HDPE Sign - Notice - T-Rex Enclosure Must Be Closed",
+    "Part Group": "Signs",
+    "Part Type": "Small Signs",
+    "Grade": "HDPE",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "ACM-01",
+    "Name": "3mm ACM Black Sign - Weyland-Yutani Corp Logo",
+    "Part Group": "Signs",
+    "Part Type": "Small Signs",
+    "Material": "ACM",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "ACM-02",
+    "Name": "3mm ACMx11-1/2x11\" B,R,BL/W Sign // Warning, Lava Tube, 1-800-555-LAVA, Volcano Corp",
+    "Part Group": "Signs",
+    "Part Type": "Small Signs",
+    "Material": "ACM",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "ALU-01",
+    "Name": "090x14x10\" R/W Sign || NO LASER BLASTER FIRING",
+    "Part Group": "Signs",
+    "Part Type": "Small Signs",
+    "Material": "Aluminum",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "ALU-02",
+    "Name": "050x40x6\" DkBL,Lt.BL,MedBL,B/W Sign - Stark Industries Logo, Clearance - *Specify Variable Height",
+    "Part Group": "Signs",
+    "Part Type": "Large Signs",
+    "Material": "Aluminum",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "ALU-03",
+    "Name": "024x40x35\" Sign w/VHB Tape: Slurm Concentrate, 4,1,0, DC 8,000, WC 7,200, GHS Danger",
+    "Part Group": "Signs",
+    "Part Type": "Large Signs",
+    "Material": "Aluminum",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "MAG-01",
+    "Name": "24x18\" B/W Magnet - Ghostbusters Logo",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "MAG-02",
+    "Name": "10x10\" Diamond B,W/R 60mil Magnet Decal - Hazmat Flammable, 1993, 3",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "OPS-01",
+    "Name": "1-1/2\"x1/2\" B/R Decal - OPUS Cut - Sold as 144 per sheet - 5# Fixed Factor",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "OPS-02",
+    "Name": "11 1/2\" x 8\" Black OPUS Cut PMPS Decal || City Of Atlantis, Ocean & Tide Department, (2) Tridents",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "PMP-01",
+    "Name": "10x6\" BL,GY PMPS Decal - Hyperloop Transmission",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "BAN-01",
+    "Name": "120x14\" Full Color Banner - ACME Properties, Finish Line, Roadrunner Dash",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "BAN-02",
+    "Name": "30x36\" CMYK RGB Banner - VANDELAY INDUSTRIES, Latex Institute, *Specify Variable Message*",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "VIN-01",
+    "Name": "24x18\" W/B,R X-Treme Vinyl Decal",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Rev": "ROL",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "RBL-01",
+    "Name": "14x10\" B,BL/W Rebel Decal",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Rev": "ROL",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "MAG-03",
+    "Name": "14x10\" R,B/W 60mil Magnet Decal",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "SCR-01",
+    "Name": "1\" x 1-1/2\" Black on Clear Vinyl Decal || B",
+    "Part Group": "Signs",
+    "Part Type": "Decal/Media",
+    "Rev": "SCN",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "COR-01",
+    "Name": "12x9\" B/W Coroplast Sign - HOVERBOARD LANE CLOSED",
+    "Part Group": "Signs",
+    "Part Type": "Temporary Markings",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "TAG-01",
+    "Name": "023x2-3/8x4-3/4\" B/W HDPE Tag || Cyberdyne, Station Name, Date, Neural Net#, Work Order#",
+    "Part Group": "Signs",
+    "Part Type": "Temporary Markings",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "TAG-02",
+    "Name": "023x2x3.5\" B/YG HDPE Tag - Jurassic Park - Raptor Enclosure Best Practices: 1 2ft 3ft 4ft 5ft 25ft 18in",
+    "Part Group": "Signs",
+    "Part Type": "Temporary Markings",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "OPS-03",
+    "Name": "1-1/10x1-1/10\" HIP Reflective OPUS Decal Y/B - #2 - 70 Units on 8.5\" x 11\" Sheet - Gotham Utilities",
+    "Part Group": "Signs",
+    "Part Type": "Temporary Markings",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "BUY-01",
+    "Name": "U-Channel Post Hardware - Vibranium Coating",
+    "Part Group": "Signs",
+    "Part Type": "Temporary Markings",
+    "Part Status": "Buy Resell"
+  },
+  {
+    "Part No": "BUL-01",
+    "Name": "16\" B,R/Y Bullet Head - Transmission, Warning Plasma Conduit, Starfleet, 800-555-WARP",
+    "Part Group": "Markers",
+    "Part Type": "Bullet Head",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "BUL-02",
+    "Name": "22\" B/Y Bullet SLEEVE ONLY - Cybertron Energon Transmission, 1-800-555-AUTO, Caution Energon PL",
+    "Part Group": "Markers",
+    "Part Type": "Bullet Head",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "BUL-03",
+    "Name": "120\" BLT Marker - 18\" B/Y Head - Warning Antimatter Line, 1-877-555-5002, Capsule Corp, 1-800-555-3020",
+    "Part Group": "Markers",
+    "Part Type": "Bullet Marker",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "DEL-01",
+    "Name": "120\" Lt O Delta Marker w/ Wrap Decal - Tatooine Moisture Farm, 1-800-555-JAWA, Warn Vaporator Line",
+    "Part Group": "Markers",
+    "Part Type": "Delta Marker",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "DRV-01",
+    "Name": "36\" W DRV - (1) Decals || No Dig Symbol, Warn, Spice Seam, 811 Logo, 251-555-DUNE, Arrakis",
+    "Part Group": "Markers",
+    "Part Type": "DRV",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "DRV-02",
+    "Name": "60\" O DRV - (2) Decals - Warning Buried Matrix Cable, 811, Zion Comm, 855-555-NEO1",
+    "Part Group": "Markers",
+    "Part Type": "DRV",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "WS-01",
+    "Name": "48\" Wrap Sign Marker - Daily Planet Rooftop Edition",
+    "Part Group": "Markers",
+    "Part Type": "Wrap Sign Marker",
+    "Part Status": "Active"
+  },
+  {
+    "Part No": "H41-01",
+    "Name": "60\" Yellow H41 Marker - Wayne Enterprises Perimeter",
+    "Part Group": "Markers",
+    "Part Type": "H41 Marker",
+    "Part Status": "Active"
+  }
+]
