@@ -8,7 +8,7 @@ import DataImporter from './components/DataImporter';
 
 function App() {
   const [searchPrefill, setSearchPrefill] = useState('');
-  const [autoGenOn, setAutoGenOn] = useState(false);
+  const [autoGenOn, setAutoGenOn] = useState(true);
   const [autoPartType, setAutoPartType] = useState('');
   const [searchTrigger, setSearchTrigger] = useState(0);
   

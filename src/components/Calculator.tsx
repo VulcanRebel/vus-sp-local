@@ -94,7 +94,7 @@ export default function Calculator({
     const [error, setError] = useState<string>('');
 
     // Search Interaction
-    const [autoGeneratePartNo, setAutoGeneratePartNo] = useState(false);
+    const [autoGeneratePartNo, setAutoGeneratePartNo] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchTermSuffix, setSearchTermSuffix] = useState('');
 
