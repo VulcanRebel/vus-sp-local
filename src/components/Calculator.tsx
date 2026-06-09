@@ -124,7 +124,7 @@ export default function Calculator({
         const h = formatDim(itemHeight);
 
         // Markers
-        if (partGroup === 'lineMarkers' && partType === 'bullet') {
+        if (partGroup === 'lineMarkers' && (partType === 'bullet' || partType === 'delta' || partType === 'drv')) {
             const length = tubeLength === 'custom' ? formatDim(customTubeLength) : formatDim(tubeLength);
             return length ? `${length}` : '';
         }
@@ -399,8 +399,24 @@ export default function Calculator({
                 break;
             }
 
-            case 'delta': 
-            case 'drv':
+            case 'delta': {
+                const finalTubeLength = tubeLength === 'custom' ? parseFloat(customTubeLength) || 0 : parseFloat(tubeLength);
+                const weight = finalTubeLength * 0.03188;
+
+                calculatedResults = {
+                    weight: { value: weight, label: "Total Marker Weight:" }
+                };
+                break;
+            } 
+            case 'drv': {
+                const finalTubeLength = tubeLength === 'custom' ? parseFloat(customTubeLength) || 0 : parseFloat(tubeLength);
+                const weight = finalTubeLength * 0.04583;
+
+                calculatedResults = {
+                    weight: { value: weight, label: "Total Marker Weight:" }
+                };
+                break;
+            }
             case 'accessories':
             case 'frame': {
                 // Restored Catch-all for simple parts
@@ -412,7 +428,7 @@ export default function Calculator({
             }
         }
         setResults(calculatedResults);
-
+        
         // Auto-Search trigger
         if (autoGeneratePartNo && onTriggerSearch) {
             onTriggerSearch();
@@ -623,9 +639,34 @@ export default function Calculator({
                         </div>
                     </div>
                 )}
+
+                {(partType === 'delta' || partType === 'drv') && (
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="markerTubeLength" className={STYLES.label}>Tube Length</label>
+                            <select id="markerTubeLength" value={tubeLength} onChange={(e) => setTubeLength(e.target.value)} className={STYLES.select}>
+                                <option value="36">36in</option>
+                                <option value="48">48in</option>
+                                <option value="60">60in</option>
+                                <option value="66">66in</option>
+                                <option value="72">72in</option>
+                                <option value="84">84in</option>
+                                <option value="96">96in</option>
+                                <option value="120">120in</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        {tubeLength === 'custom' && (
+                            <div>
+                                <label htmlFor="customMarkerLengthInput" className={STYLES.label}>Custom Length</label>
+                                <input type="text" id="customMarkerLengthInput" value={customTubeLength} onChange={(e) => setCustomTubeLength(e.target.value)} placeholder="Enter custom length" className={STYLES.input}/>
+                            </div>
+                        )}
+                    </div>
+                )}
                 
                 {/* Item Size Inputs */}
-                {partType !== 'bullet' && (
+                {partType !== 'bullet' && partType !== 'delta' && partType !== 'drv' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-800">
                         <div>
                             <label htmlFor="itemWidth" className={STYLES.label}>Item Width (in)</label>
